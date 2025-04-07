@@ -12,10 +12,18 @@ public class Task {
     }
 
     public int taskProcessingTime(){
-        return 0;
+        return serviceTime;
     }
 
     public int getArrivalTime() {
         return arrivalTime;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void decrementServiceTime() {
+        serviceTime--;
     }
 }

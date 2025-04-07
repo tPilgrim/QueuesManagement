@@ -1,6 +1,9 @@
 package Model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Server implements Runnable {
@@ -8,30 +11,45 @@ public class Server implements Runnable {
     private AtomicInteger waitingPeriod;
 
     public Server() {
-        this.tasks = null;
+        this.tasks = new LinkedBlockingQueue<>();
         this.waitingPeriod = new AtomicInteger();
     }
 
     public void addTask(Task newTask){
         this.tasks.add(newTask);
-        waitingPeriod.incrementAndGet();
+        waitingPeriod.addAndGet(newTask.taskProcessingTime());
     }
 
-    public void run(){
-        Thread nextTask = new Thread(() -> {
+    public void run() {
+        while (true) {
             try {
-                while (true) {
-                    Task task = tasks.take();
-                    Thread.sleep(task.taskProcessingTime());
-                    waitingPeriod.decrementAndGet();
+                Thread.sleep(1000);
+                if (!tasks.isEmpty()) {
+                    Task task = tasks.peek();
+                    if (task != null) {
+                        task.decrementServiceTime();
+
+                        if (task.taskProcessingTime() == 0) {
+                            tasks.take();
+                            waitingPeriod.addAndGet(-task.taskProcessingTime());
+                        }
+                    }
                 }
             } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
             }
-        });
+        }
     }
 
-    public Task[] getTasks(){
-        return this.tasks.toArray(new Task[0]);
+    public List<Task> getTasks() {
+        return new ArrayList<>(tasks);
+    }
+
+    public AtomicInteger getWaitingPeriod() {
+        return waitingPeriod;
+    }
+
+    public int getNumberOfTasks() {
+        return tasks.size();
     }
 }

@@ -1,36 +1,57 @@
 package BusinessLogic;
 
+import GUI.SimulationFrame;
 import Model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class SimulationManager implements Runnable {
 
-    public int timeLimit = 100;
-    public int maxProcessingTime = 10;
-    public int minProcessingTime = 2;
-    public int numberOfServers = 3;
-    public int numberOfClients = 100;
+    public int timeLimit;
+    public int maxProcessingTime;
+    public int minProcessingTime;
+    public int maxArrivalTime;
+    public int minArrivalTime;
+    public int numberOfServers;
+    public int numberOfClients;
     public SelectionPolicy selectionPolicy = SelectionPolicy.SHORTEST_TIME;
 
     private Scheduler scheduler;
-    //private SimulationFrame frame;
+    private SimulationFrame frame;
     private List<Task> generatedTasks;
+    private BufferedWriter logWriter;
 
-    public SimulationManager() {
+    public SimulationManager(int numberOfClients, int numberOfServers, int timeLimit, int minArrivalTime, int maxArrivalTime, int minProcessingTime, int maxProcessingTime, SimulationFrame frame) {
+        this.numberOfClients = numberOfClients;
+        this.numberOfServers = numberOfServers;
+        this.timeLimit = timeLimit;
+        this.minArrivalTime = minArrivalTime;
+        this.maxArrivalTime = maxArrivalTime;
+        this.minProcessingTime = minProcessingTime;
+        this.maxProcessingTime = maxProcessingTime;
+        this.frame = frame;
+
         scheduler = new Scheduler(numberOfServers, maxProcessingTime);
-        //=> create and start numberOfServers threads
         scheduler.changeStrategy(selectionPolicy);
-        // initialize frame to display simulation
+        generatedTasks = new ArrayList<>();
+
         generateNRandomTasks();
+
+        try {
+            logWriter = new BufferedWriter(new FileWriter("simulation_log.txt"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void generateNRandomTasks(){
-        generatedTasks = new ArrayList<>();
         for (int i = 0; i < numberOfClients; i++) {
             int processingTime = (int) (Math.random() * (maxProcessingTime - minProcessingTime + 1)) + minProcessingTime;
-            int arrivalTime = (int) (Math.random() * timeLimit);
+            int arrivalTime = (int) (Math.random() * (maxArrivalTime - minArrivalTime + 1)) + minArrivalTime;
             Task task = new Task(i,arrivalTime, processingTime);
             generatedTasks.add(task);
         }
@@ -51,10 +72,25 @@ public class SimulationManager implements Runnable {
     @Override
     public void run() {
         int currentTime = 0;
-        while(currentTime < timeLimit){
+        boolean emptyQueue = false;
+        int activeQueue = 0;
+
+        while (currentTime <= timeLimit && !emptyQueue) {
+            activeQueue = 0;
+            for (int i = 0; i < scheduler.getServers().size(); i++) {
+                List<Task> queueTasks = scheduler.getServers().get(i).getTasks();
+                if (queueTasks.size()!=0) {
+                    activeQueue++;
+                }
+            }
+
+            if(generatedTasks.isEmpty() && activeQueue == 0){
+                emptyQueue = true;
+            }
+
             List<Task> tasksToDispatch = new ArrayList<>();
             for (Task task : generatedTasks) {
-                if (task.getArrivalTime() == currentTime) {
+                if (task.getArrivalTime() <= currentTime) {
                     tasksToDispatch.add(task);
                 }
             }
@@ -64,7 +100,39 @@ public class SimulationManager implements Runnable {
                 generatedTasks.remove(task);
             }
 
-            // update UI frame
+            StringBuilder log = new StringBuilder();
+            log.append("Time ").append(currentTime).append("\n");
+
+            log.append("Waiting clients: ");
+            if (generatedTasks.isEmpty()) {
+                log.append("\n");
+            } else {
+                for (Task t : generatedTasks) {
+                    log.append(String.format("(%d,%d,%d); ", t.getId(), t.getArrivalTime(), t.taskProcessingTime()));
+                }
+                log.append("\n");
+            }
+
+            for (int i = 0; i < scheduler.getServers().size(); i++) {
+                log.append("Queue ").append(i + 1).append(": ");
+                List<Task> queueTasks = scheduler.getServers().get(i).getTasks();
+                if (queueTasks != null && !queueTasks.isEmpty()) {
+                    for (Task t : queueTasks) {
+                        log.append(String.format("(%d,%d,%d); ", t.getId(), t.getArrivalTime(), t.taskProcessingTime()));
+                    }
+                }
+                log.append("\n");
+            }
+
+            frame.updateLog(log.toString());
+
+            try {
+                logWriter.write(log.toString());
+                logWriter.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             currentTime++;
 
             try {
@@ -73,11 +141,14 @@ public class SimulationManager implements Runnable {
                 e.printStackTrace();
             }
         }
-    }
 
-    public static void main(String[] args) {
-        SimulationManager gen = new SimulationManager();
-        Thread t = new Thread(gen);
-        t.start();
+        try {
+            logWriter.newLine();
+            logWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        frame.setRunning();
     }
 }
