@@ -23,31 +23,31 @@ public class SimulationFrame extends JFrame {
         JPanel inputPanel = new JPanel(new GridLayout(8, 2));
 
         inputPanel.add(new JLabel("Number of Clients:"));
-        txtClients = new JTextField();
+        txtClients = new JTextField("4");
         inputPanel.add(txtClients);
 
         inputPanel.add(new JLabel("Number of Queues:"));
-        txtQueues = new JTextField();
+        txtQueues = new JTextField("2");
         inputPanel.add(txtQueues);
 
         inputPanel.add(new JLabel("Simulation Time:"));
-        txtSimTime = new JTextField();
+        txtSimTime = new JTextField("10");
         inputPanel.add(txtSimTime);
 
         inputPanel.add(new JLabel("Min Arrival Time:"));
-        txtMinArrival = new JTextField();
+        txtMinArrival = new JTextField("2");
         inputPanel.add(txtMinArrival);
 
         inputPanel.add(new JLabel("Max Arrival Time:"));
-        txtMaxArrival = new JTextField();
+        txtMaxArrival = new JTextField("8");
         inputPanel.add(txtMaxArrival);
 
         inputPanel.add(new JLabel("Min Service Time:"));
-        txtMinService = new JTextField();
+        txtMinService = new JTextField("2");
         inputPanel.add(txtMinService);
 
         inputPanel.add(new JLabel("Max Service Time:"));
-        txtMaxService = new JTextField();
+        txtMaxService = new JTextField("4");
         inputPanel.add(txtMaxService);
 
         validateButton = new JButton("Validate Input Data");
