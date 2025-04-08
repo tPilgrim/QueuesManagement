@@ -116,10 +116,14 @@ public class SimulationManager implements Runnable {
             for (int i = 0; i < scheduler.getServers().size(); i++) {
                 log.append("Queue ").append(i + 1).append(": ");
                 List<Task> queueTasks = scheduler.getServers().get(i).getTasks();
-                if (queueTasks != null && !queueTasks.isEmpty()) {
-                    for (Task t : queueTasks) {
-                        log.append(String.format("(%d,%d,%d); ", t.getId(), t.getArrivalTime(), t.taskProcessingTime()));
+                for (Task t : queueTasks) {
+                    int taskId = t.getId();
+                    int arrival = t.getArrivalTime();
+                    int service;
+                    synchronized (t) {
+                        service = t.taskProcessingTime();
                     }
+                    log.append(String.format("(%d,%d,%d); ", taskId, arrival, service));
                 }
                 log.append("\n");
             }

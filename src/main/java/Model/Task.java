@@ -11,7 +11,7 @@ public class Task {
         this.serviceTime = serviceTime;
     }
 
-    public int taskProcessingTime(){
+    public synchronized int taskProcessingTime(){
         return serviceTime;
     }
 
@@ -23,7 +23,7 @@ public class Task {
         return id;
     }
 
-    public void decrementServiceTime() {
+    public synchronized void decrementServiceTime() {
         serviceTime--;
     }
 }
