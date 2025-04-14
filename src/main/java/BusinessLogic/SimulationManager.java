@@ -1,6 +1,7 @@
 package BusinessLogic;
 
-import GUI.SimulationFrame;
+import GUI.SimulationView;
+import Model.Server;
 import Model.Task;
 
 import java.util.ArrayList;
@@ -18,14 +19,20 @@ public class SimulationManager implements Runnable {
     public int minArrivalTime;
     public int numberOfServers;
     public int numberOfClients;
-    public SelectionPolicy selectionPolicy = SelectionPolicy.SHORTEST_TIME;
 
     private Scheduler scheduler;
-    private SimulationFrame frame;
     private List<Task> generatedTasks;
     private BufferedWriter logWriter;
 
-    public SimulationManager(int numberOfClients, int numberOfServers, int timeLimit, int minArrivalTime, int maxArrivalTime, int minProcessingTime, int maxProcessingTime, SimulationFrame frame) {
+    private int currentTime;
+    private SimulationView simulationView;
+
+    private int peakHour = 0;
+    private int maxTasksInQueues = 0;
+    private float waitingTime = 0;
+    private int dipachedTasks = 0;
+
+    public SimulationManager(int numberOfClients, int numberOfServers, int timeLimit, int minArrivalTime, int maxArrivalTime, int minProcessingTime, int maxProcessingTime, SelectionPolicy policy) {
         this.numberOfClients = numberOfClients;
         this.numberOfServers = numberOfServers;
         this.timeLimit = timeLimit;
@@ -33,11 +40,11 @@ public class SimulationManager implements Runnable {
         this.maxArrivalTime = maxArrivalTime;
         this.minProcessingTime = minProcessingTime;
         this.maxProcessingTime = maxProcessingTime;
-        this.frame = frame;
 
-        scheduler = new Scheduler(numberOfServers, maxProcessingTime);
-        scheduler.changeStrategy(selectionPolicy);
+        scheduler = new Scheduler(numberOfServers);
+        scheduler.changeStrategy(policy);
         generatedTasks = new ArrayList<>();
+        simulationView = new SimulationView(this);
 
         generateNRandomTasks();
 
@@ -71,9 +78,8 @@ public class SimulationManager implements Runnable {
 
     @Override
     public void run() {
-        int currentTime = 0;
         boolean emptyQueue = false;
-        int activeQueue = 0;
+        int activeQueue;
 
         while (currentTime <= timeLimit && !emptyQueue) {
             activeQueue = 0;
@@ -97,6 +103,7 @@ public class SimulationManager implements Runnable {
 
             for (Task task : tasksToDispatch) {
                 scheduler.dispachTask(task);
+                dipachedTasks++;
                 generatedTasks.remove(task);
             }
 
@@ -115,20 +122,18 @@ public class SimulationManager implements Runnable {
 
             for (int i = 0; i < scheduler.getServers().size(); i++) {
                 log.append("Queue ").append(i + 1).append(": ");
+                waitingTime += scheduler.getServers().get(i).getTasks().size();
                 List<Task> queueTasks = scheduler.getServers().get(i).getTasks();
-                for (Task t : queueTasks) {
-                    int taskId = t.getId();
-                    int arrival = t.getArrivalTime();
-                    int service;
-                    synchronized (t) {
-                        service = t.taskProcessingTime();
+                synchronized (queueTasks){
+                    for (Task t : queueTasks) {
+                        int taskId = t.getId();
+                        int arrival = t.getArrivalTime();
+                        int service = t.taskProcessingTime();
+                        log.append(String.format("(%d,%d,%d); ", taskId, arrival, service));
                     }
-                    log.append(String.format("(%d,%d,%d); ", taskId, arrival, service));
                 }
                 log.append("\n");
             }
-
-            frame.updateLog(log.toString());
 
             try {
                 logWriter.write(log.toString());
@@ -137,7 +142,18 @@ public class SimulationManager implements Runnable {
                 e.printStackTrace();
             }
 
+            int totalTasksInQueues = 0;
+            for (Server server : scheduler.getServers()) {
+                totalTasksInQueues += server.getNumberOfTasks();
+            }
+            if (totalTasksInQueues > maxTasksInQueues) {
+                maxTasksInQueues = totalTasksInQueues;
+                peakHour = currentTime;
+            }
+
             currentTime++;
+
+            simulationView.updateView();
 
             try {
                 Thread.sleep(1000);
@@ -147,12 +163,40 @@ public class SimulationManager implements Runnable {
         }
 
         try {
+            logWriter.write("Peak Hour: " + peakHour);
+            logWriter.newLine();
+            logWriter.write("Average Waiting Time: " + waitingTime/dipachedTasks);
             logWriter.newLine();
             logWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        frame.setRunning();
+    public List<Server> getServers() {
+        return scheduler.getServers();
+    }
+
+    public List<Task> getGeneratedTasks() {
+        return generatedTasks;
+    }
+
+    public int getTime(){
+        return currentTime;
+    }
+
+    public int getPeakHour(){
+        return  peakHour;
+    }
+
+    public float getAvgWaitingTime(){
+        if(dipachedTasks == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            return waitingTime/dipachedTasks;
+        }
     }
 }

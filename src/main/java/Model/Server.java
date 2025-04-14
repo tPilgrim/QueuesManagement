@@ -20,21 +20,24 @@ public class Server implements Runnable {
         waitingPeriod.addAndGet(newTask.taskProcessingTime());
     }
 
+    @Override
     public void run() {
         while (true) {
             try {
-                Thread.sleep(1000);
-                if (!tasks.isEmpty()) {
-                    Task task = tasks.peek();
-                    if (task != null) {
-                        task.decrementServiceTime();
+                synchronized (tasks) {
+                    if (!tasks.isEmpty()) {
+                        Task task = tasks.peek();
+                        if (task != null) {
+                            task.decrementServiceTime();
+                            waitingPeriod.decrementAndGet();
 
-                        if (task.taskProcessingTime() == 0) {
-                            tasks.take();
-                            waitingPeriod.addAndGet(-task.taskProcessingTime());
+                            if (task.taskProcessingTime() == 0) {
+                                tasks.take();
+                            }
                         }
                     }
                 }
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -42,7 +45,9 @@ public class Server implements Runnable {
     }
 
     public List<Task> getTasks() {
-        return new ArrayList<>(tasks);
+        synchronized (tasks) {
+            return new ArrayList<>(tasks);
+        }
     }
 
     public AtomicInteger getWaitingPeriod() {
@@ -50,6 +55,8 @@ public class Server implements Runnable {
     }
 
     public int getNumberOfTasks() {
-        return tasks.size();
+        synchronized (tasks) {
+            return tasks.size();
+        }
     }
 }

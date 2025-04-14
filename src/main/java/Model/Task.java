@@ -15,7 +15,7 @@ public class Task {
         return serviceTime;
     }
 
-    public int getArrivalTime() {
+    public synchronized int getArrivalTime() {
         return arrivalTime;
     }
 

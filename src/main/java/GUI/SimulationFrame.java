@@ -1,5 +1,6 @@
 package GUI;
 
+import BusinessLogic.SelectionPolicy;
 import BusinessLogic.SimulationManager;
 
 import javax.swing.*;
@@ -9,46 +10,49 @@ import java.awt.event.ActionEvent;
 public class SimulationFrame extends JFrame {
 
     private JTextField txtClients, txtQueues, txtSimTime, txtMinArrival, txtMaxArrival, txtMinService, txtMaxService;
-    private JTextArea logArea;
     private JButton validateButton, startButton;
-    private boolean isRunning;
+    private JComboBox<String> strategyComboBox;
 
     public SimulationFrame() {
         setTitle("Queue Management Simulation");
-        setSize(600, 600);
+        setSize(600, 270);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        JPanel inputPanel = new JPanel(new GridLayout(8, 2));
+        JPanel inputPanel = new JPanel(new GridLayout(9, 2));
 
         inputPanel.add(new JLabel("Number of Clients:"));
-        txtClients = new JTextField("4");
+        txtClients = new JTextField();
         inputPanel.add(txtClients);
 
         inputPanel.add(new JLabel("Number of Queues:"));
-        txtQueues = new JTextField("2");
+        txtQueues = new JTextField();
         inputPanel.add(txtQueues);
 
         inputPanel.add(new JLabel("Simulation Time:"));
-        txtSimTime = new JTextField("10");
+        txtSimTime = new JTextField();
         inputPanel.add(txtSimTime);
 
         inputPanel.add(new JLabel("Min Arrival Time:"));
-        txtMinArrival = new JTextField("2");
+        txtMinArrival = new JTextField();
         inputPanel.add(txtMinArrival);
 
         inputPanel.add(new JLabel("Max Arrival Time:"));
-        txtMaxArrival = new JTextField("8");
+        txtMaxArrival = new JTextField();
         inputPanel.add(txtMaxArrival);
 
         inputPanel.add(new JLabel("Min Service Time:"));
-        txtMinService = new JTextField("2");
+        txtMinService = new JTextField();
         inputPanel.add(txtMinService);
 
         inputPanel.add(new JLabel("Max Service Time:"));
-        txtMaxService = new JTextField("4");
+        txtMaxService = new JTextField();
         inputPanel.add(txtMaxService);
+
+        inputPanel.add(new JLabel("Strategy:"));
+        strategyComboBox = new JComboBox<>(new String[]{"Shortest Time", "Shortest Queue"});
+        inputPanel.add(strategyComboBox);
 
         validateButton = new JButton("Validate Input Data");
         inputPanel.add(validateButton);
@@ -58,11 +62,6 @@ public class SimulationFrame extends JFrame {
         inputPanel.add(startButton);
 
         add(inputPanel, BorderLayout.NORTH);
-
-        logArea = new JTextArea();
-        logArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(logArea);
-        add(scrollPane, BorderLayout.CENTER);
 
         validateButton.addActionListener((ActionEvent e) -> validateAndPrompt());
         startButton.addActionListener((ActionEvent e) -> startSimulation());
@@ -118,37 +117,31 @@ public class SimulationFrame extends JFrame {
     }
 
     private void startSimulation() {
-        if(!isRunning) {
-            logArea.setText("");
-            int clients = Integer.parseInt(txtClients.getText().trim());
-            int queues = Integer.parseInt(txtQueues.getText().trim());
-            int simTime = Integer.parseInt(txtSimTime.getText().trim());
-            int minArrival = Integer.parseInt(txtMinArrival.getText().trim());
-            int maxArrival = Integer.parseInt(txtMaxArrival.getText().trim());
-            int minService = Integer.parseInt(txtMinService.getText().trim());
-            int maxService = Integer.parseInt(txtMaxService.getText().trim());
+        int clients = Integer.parseInt(txtClients.getText().trim());
+        int queues = Integer.parseInt(txtQueues.getText().trim());
+        int simTime = Integer.parseInt(txtSimTime.getText().trim());
+        int minArrival = Integer.parseInt(txtMinArrival.getText().trim());
+        int maxArrival = Integer.parseInt(txtMaxArrival.getText().trim());
+        int minService = Integer.parseInt(txtMinService.getText().trim());
+        int maxService = Integer.parseInt(txtMaxService.getText().trim());
 
-            SimulationManager manager = new SimulationManager(clients, queues, simTime, minArrival, maxArrival, minService, maxService,this);
-
-            Thread simThread = new Thread(manager);
-            simThread.start();
-            isRunning = true;
-            startButton.setEnabled(false);
-            validateButton.setEnabled(false);
+        String selectedStrategy = (String) strategyComboBox.getSelectedItem();
+        SelectionPolicy policy;
+        if ("Shortest Queue".equals(selectedStrategy)) {
+            policy = SelectionPolicy.SHORTEST_QUEUE;
+        } else {
+            policy = SelectionPolicy.SHORTEST_TIME;
         }
+
+        SimulationManager manager = new SimulationManager(clients, queues, simTime, minArrival, maxArrival, minService, maxService, policy);
+
+        Thread simThread = new Thread(manager);
+        simThread.start();
+        startButton.setEnabled(false);
     }
 
     private void showError(String message) {
         JOptionPane.showMessageDialog(this, message, "Input Error", JOptionPane.ERROR_MESSAGE);
-    }
-
-    public void updateLog(String message) {
-        SwingUtilities.invokeLater(() -> logArea.append(message + "\n"));
-    }
-
-    public void setRunning() {
-        isRunning = false;
-        validateButton.setEnabled(true);
     }
 
     public static void main(String[] args) {

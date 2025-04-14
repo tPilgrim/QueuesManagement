@@ -5,8 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fa3cc106-cc6d-4c01-91e6-ffdcfea53e1d" name="Changes" comment="git commit">
+      <change afterPath="$PROJECT_DIR$/src/main/java/GUI/SimulationView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/simulation_log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/simulation_log.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simulation_log1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/simulation_log1.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simulation_log2.txt" beforeDir="false" afterPath="$PROJECT_DIR$/simulation_log2.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simulation_log3.txt" beforeDir="false" afterPath="$PROJECT_DIR$/simulation_log3.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BusinessLogic/Scheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BusinessLogic/Scheduler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BusinessLogic/SimulationManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BusinessLogic/SimulationManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/GUI/SimulationFrame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/GUI/SimulationFrame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Model/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Model/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Model/Task.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Model/Task.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,24 +42,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.SimulationFrame.executor&quot;: &quot;Run&quot;,
-    &quot;Application.SimulationManager.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/souca/Desktop/TP22&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/souca/Desktop/TP/pt2025_30221_souca_vlad_assigment_2/src/main/java/org/example/Main.java&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.SimulationFrame.executor": "Run",
+    "Application.SimulationManager.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/souca/Desktop/TP22",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "C:/Users/souca/Desktop/TP/pt2025_30221_souca_vlad_assigment_2/src/main/java/org/example/Main.java",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -75,6 +84,11 @@
       <workItem from="1743813510795" duration="661000" />
       <workItem from="1744056914321" duration="7367000" />
       <workItem from="1744091879988" duration="938000" />
+      <workItem from="1744096599811" duration="5580000" />
+      <workItem from="1744576045393" duration="3398000" />
+      <workItem from="1744579648173" duration="556000" />
+      <workItem from="1744646002090" duration="6322000" />
+      <workItem from="1744653257748" duration="11333000" />
     </task>
     <task id="LOCAL-00001" summary="git commit">
       <option name="closed" value="true" />
@@ -116,7 +130,15 @@
       <option name="project" value="LOCAL" />
       <updated>1744092057143</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="git commit">
+      <option name="closed" value="true" />
+      <created>1744096819440</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1744096819440</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
