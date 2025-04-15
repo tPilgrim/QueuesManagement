@@ -171,6 +171,8 @@ public class SimulationManager implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        scheduler.shutdown();
     }
 
     public List<Server> getServers() {

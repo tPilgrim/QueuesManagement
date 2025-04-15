@@ -22,7 +22,7 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             try {
                 synchronized (tasks) {
                     if (!tasks.isEmpty()) {
@@ -39,7 +39,7 @@ public class Server implements Runnable {
                 }
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                Thread.currentThread().interrupt();
             }
         }
     }

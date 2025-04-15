@@ -5,21 +5,24 @@ import Model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Scheduler {
     private List<Server> servers;
     private int maxNoServers;
     private Strategy strategy;
+    private ExecutorService executor;
 
     public Scheduler(int maxNoServers) {
         this.maxNoServers = maxNoServers;
         this.servers = new ArrayList<>();
+        this.executor = Executors.newFixedThreadPool(maxNoServers);
 
         for (int i = 0; i < maxNoServers; i++) {
             Server server = new Server();
             servers.add(server);
-            Thread serverThread = new Thread(server);
-            serverThread.start();
+            executor.submit(server);
         }
     }
 
@@ -40,4 +43,7 @@ public class Scheduler {
         return servers;
     }
 
+    public void shutdown() {
+        executor.shutdownNow();
+    }
 }
